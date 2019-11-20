@@ -35,4 +35,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.GONE, request);
     }
 
+    @ExceptionHandler({ UserAlreadyExistsException.class })
+    protected ResponseEntity<Object> userAlreadyExits(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "User Already Exits",
+                new HttpHeaders(), HttpStatus.GONE, request);
+    }
+
+    @ExceptionHandler({ InvalidAuthEmailException.class })
+    protected ResponseEntity<Object> failedAuthEmail(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Invalid AuthEmail Code",
+                new HttpHeaders(), HttpStatus.GONE, request);
+    }
+
 }
