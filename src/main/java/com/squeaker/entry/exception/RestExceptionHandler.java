@@ -17,4 +17,22 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler({ InvalidBodyException.class })
+    protected ResponseEntity<Object> invalidBody(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Invalid Boody",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({ InvalidTokenException.class })
+    protected ResponseEntity<Object> invalidToken(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Invalid Token",
+                new HttpHeaders(), HttpStatus.FORBIDDEN, request);
+    }
+
+    @ExceptionHandler({ ExpiredTokenException.class })
+    protected ResponseEntity<Object> expiredToken(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Expired token",
+                new HttpHeaders(), HttpStatus.GONE, request);
+    }
+
 }
