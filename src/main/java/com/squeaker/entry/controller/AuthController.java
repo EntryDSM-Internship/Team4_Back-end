@@ -15,8 +15,8 @@ public class AuthController {
     }
 
     @PutMapping
-    public Token refreshToken(@RequestHeader("Authorization") String accessToken) {
-        return new AuthDAO().refreshToken(accessToken);
+    public Token refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        return new AuthDAO().refreshToken(refreshToken);
     }
 
 }
