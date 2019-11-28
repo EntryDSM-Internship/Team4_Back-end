@@ -12,7 +12,8 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
     @PostMapping
-    public void signUp(@RequestParam String userId, String userPw, String userName, String userIntro, String emailCode, @RequestParam("file") MultipartFile file) {
+    public void signUp(@RequestParam String userId, String userPw, String userName, String userIntro, String emailCode,
+                       @RequestParam(name = "file", required = false) MultipartFile file) {
         new UserDAO().signUp(new UserSignUp(userId, userPw, userName, userIntro, emailCode), file);
     }
 

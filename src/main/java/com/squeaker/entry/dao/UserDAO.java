@@ -50,12 +50,16 @@ public class UserDAO extends Query {
                     userSignUp.getUserIntro()
             ));
             resultSet = statement.executeQuery(query("select * from user where userId='%s'", userSignUp.getUserId()));
+            resultSet.next();
             int uuid = resultSet.getInt("uuid");
-            if (!file.isEmpty()) {
-                byte[] data = file.getBytes();
-                FileOutputStream fileOutputStream = new FileOutputStream("/static/user/"+uuid+".jpg");
-                fileOutputStream.write(data);
-                fileOutputStream.close();
+            if (file != null) {
+                File convFile = new File("src/main/resources/static/user/"+uuid+".png");
+                convFile.createNewFile();
+                FileOutputStream fos = new FileOutputStream(convFile);
+
+                fos.write(file.getBytes());
+
+                fos.close();
             }
             return;
         } catch (SQLException | IOException e) {
