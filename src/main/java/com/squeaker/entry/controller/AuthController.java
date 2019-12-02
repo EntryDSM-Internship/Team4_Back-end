@@ -1,22 +1,28 @@
 package com.squeaker.entry.controller;
 
-import com.squeaker.entry.body.Token;
-import com.squeaker.entry.body.UserSignIn;
-import com.squeaker.entry.dao.AuthDAO;
+import com.squeaker.entry.domain.payload.request.UserSignIn;
+import com.squeaker.entry.domain.payload.response.TokenResponse;
+import com.squeaker.entry.service.AuthServiceImpl;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
 
+    @Autowired
+    AuthServiceImpl authService;
+
     @PostMapping
-    public Token signIn(@RequestBody UserSignIn userSignIn) {
-        return new AuthDAO().signIn(userSignIn);
+    public TokenResponse signIn(@RequestBody @NotNull UserSignIn userSignIn) {
+        return authService.login(userSignIn.getUserId(), userSignIn.getUserPw());
     }
 
     @PutMapping
-    public Token refreshToken(@RequestHeader("Authorization") String refreshToken) {
-        return new AuthDAO().refreshToken(refreshToken);
+    public TokenResponse refreshToken(@RequestHeader("Authorization") String refreshToken) {
+        return authService.refreshToken(refreshToken);
     }
 
 }

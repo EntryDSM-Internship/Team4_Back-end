@@ -25,7 +25,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler({ InvalidTokenException.class })
     protected ResponseEntity<Object> invalidToken(Exception ex, WebRequest request) {
-        return handleExceptionInternal(ex, "Invalid Token",
+        return handleExceptionInternal(ex, "Invalid TokenResponse",
                 new HttpHeaders(), HttpStatus.FORBIDDEN, request);
     }
 
