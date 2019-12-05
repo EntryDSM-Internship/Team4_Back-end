@@ -47,4 +47,10 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.GONE, request);
     }
 
+    @ExceptionHandler({ InvalidFileException.class })
+    protected ResponseEntity<Object> invalidFile(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Invalid File",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
 }

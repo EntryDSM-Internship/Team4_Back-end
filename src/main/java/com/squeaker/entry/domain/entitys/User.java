@@ -5,13 +5,13 @@ import lombok.*;
 import javax.persistence.*;
 
 @Getter
+@Setter
 @Entity
 @NoArgsConstructor
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(columnDefinition = "int auto_increment")
     private Integer uuid;
 
     @Column(nullable = false, unique = true, length = 30)
@@ -23,25 +23,21 @@ public class User {
     @Column(nullable = false, length = 12)
     private String userName;
 
-    @Column(columnDefinition = "TEXT")
-    private String userImage;
-
     @Column(length = 60)
     private String userIntro;
 
     @Column
     private String userRefreshToken;
 
-    @Column(nullable = false, columnDefinition = "int(1) default 0")
+    @Column(nullable = false)
     private Integer userPrivate;
 
     @Builder
-    public User(String userId, String userPw, String userName, String userImage,
+    public User(String userId, String userPw, String userName,
                 String userIntro, String userRefreshToken, Integer userPrivate) {
         this.userId = userId;
         this.userPw = userPw;
         this.userName = userName;
-        this.userImage = userImage;
         this.userIntro = userIntro;
         this.userRefreshToken = userRefreshToken;
         this.userPrivate = userPrivate;

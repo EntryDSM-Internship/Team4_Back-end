@@ -16,12 +16,13 @@ public class AuthServiceImpl implements AuthService {
         this.authRepository = authRepository;
     }
 
+    @Override
     public TokenResponse login(String userId, String userPw) {
 
-        User user = authRepository.findByUserId(userId);
+        User user = authRepository.findByUserIdAndUserPw(userId, userPw);
         if(user == null) throw new UserNotFoundException();
 
-        return new TokenResponse(user.getUuid());
+        return new TokenResponse(user.getUserId());
     }
 
     @Override
