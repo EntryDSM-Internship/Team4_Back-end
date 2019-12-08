@@ -7,10 +7,7 @@ import com.squeaker.entry.domain.payload.response.TwittResponse;
 import com.squeaker.entry.domain.payload.response.user.FollowResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.domain.repository.*;
-import com.squeaker.entry.exception.InvalidAuthEmailException;
-import com.squeaker.entry.exception.InvalidFileException;
-import com.squeaker.entry.exception.UserAlreadyExistsException;
-import com.squeaker.entry.exception.UserNotFoundException;
+import com.squeaker.entry.exception.*;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,13 +26,15 @@ public class UserServiceImpl implements UserService {
     private FollowRepository followRepository;
     private TwittRepository twittRepository;
     private ImageRepository imageRepository;
+    private TwittLikeRespository twittLikeRespository;
 
-    public UserServiceImpl(AuthMailRepository authMailRepository, UserRepository userRepository, FollowRepository followRepository, TwittRepository twittRepository, ImageRepository imageRepository) {
+    public UserServiceImpl(AuthMailRepository authMailRepository, UserRepository userRepository, FollowRepository followRepository, TwittRepository twittRepository, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
         this.authMailRepository = authMailRepository;
         this.userRepository = userRepository;
         this.followRepository = followRepository;
         this.twittRepository = twittRepository;
         this.imageRepository = imageRepository;
+        this.twittLikeRespository = twittLikeRespository;
     }
 
     @Override
@@ -45,6 +44,7 @@ public class UserServiceImpl implements UserService {
                 EmailAuth.builder()
                         .authEmail(email)
                         .authCode(uuid)
+                        .authState("UnAuthorized")
                         .build()
         );
 
@@ -52,29 +52,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void validEmail(String code) {
+        EmailAuth auth = authMailRepository.findByAuthCode(code);
+        if(auth == null) throw new InvalidAuthCodeException();
+
+        auth.setAuthState("Authorized");
+        authMailRepository.save(auth);
+    }
+
+    @Override
     public UserResponse getUser(Integer uuid) {
         User user = userRepository.findByUuid(uuid);
+        if(user == null) throw new UserNotFoundException();
 
         List<TwittResponse> twitts = new ArrayList<>();
         List<FollowResponse> follower = new ArrayList<>();
         List<FollowResponse> following = new ArrayList<>();
-        List<String> imageList;
 
-        for(Twitt twitt : twittRepository.findByTwittUid(user.getUuid())) {
-            List<Image> images = imageRepository.findByTwittId(twitt.getTwitId());
-            imageList = new ArrayList<>();
-            for(Image image : images)
-                imageList.add(image.getImageName());
-
-            twitts.add(
-                    TwittResponse.builder()
-                    .twittId(twitt.getTwitId())
-                    .twittUid(twitt.getTwittUid())
-                    .twittContent(twitt.getTwittContent())
-                    .twittDate(twitt.getTwittDate())
-                    .twittImage(imageList)
-                    .build()
-            );
+        for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
+            System.out.println(twitt.getTwittId());
+            twitts.add(TwittServiceImpl.getTwittList(user, twitt, imageRepository, twittLikeRespository));
         }
         for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
             if(follows.getFollower().equals(user.getUuid())) {
@@ -116,8 +113,10 @@ public class UserServiceImpl implements UserService {
     public void signUp(UserSignUp userSignUp) {
 
         if(userRepository.existsByUserId(userSignUp.getUserId())) throw new UserAlreadyExistsException();
-        EmailAuth auth = authMailRepository.findByAuthEmailAndAuthCode(userSignUp.getUserId(), userSignUp.getEmailcode());
+        EmailAuth auth = authMailRepository.findByAuthEmail(userSignUp.getUserId());
         if(auth == null) throw new InvalidAuthEmailException();
+        if(auth.getAuthState().equals("UnAuthorized")) throw new InvalidAuthCodeException();
+
         if(userSignUp.getMultipartFile() != null) {
             File file = new File("D:\\Squeaker\\user\\"+userSignUp.getUserId()+".jpg");
             try {

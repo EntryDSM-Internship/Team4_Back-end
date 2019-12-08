@@ -6,6 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface TwittRepository extends JpaRepository<Twitt, Integer> {
-    List<Twitt> findByTwittUid(Integer uuid);
+    List<Twitt> findByTwittUidOrderByTwittDateDesc(Integer uuid);
     List<Twitt> findByTwittUidInOrderByTwittDateDesc(List<Integer> uuid);
 }

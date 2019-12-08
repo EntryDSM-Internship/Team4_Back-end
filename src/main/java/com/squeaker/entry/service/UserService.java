@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public interface UserService {
     AuthCodeResponse authEmail(String email);
+    void validEmail(String code);
     UserResponse getUser(Integer uuid);
     void signUp(UserSignUp userSignUp);
     void changeUser(User user, MultipartFile file);

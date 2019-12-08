@@ -12,17 +12,15 @@ public class UserSignUp {
     private String userPw;
     private String userName;
     private String userIntro;
-    private String emailcode;
     private MultipartFile multipartFile;
 
     @Builder
     public UserSignUp(String userId, String userPw, String userName,
-                      String userIntro, String emailcode, MultipartFile multipartFile) {
+                      String userIntro, MultipartFile multipartFile) {
         this.userId = userId;
         this.userPw = userPw;
         this.userName = userName;
         this.userIntro = userIntro;
-        this.emailcode = emailcode;
         this.multipartFile = multipartFile;
     }
 }

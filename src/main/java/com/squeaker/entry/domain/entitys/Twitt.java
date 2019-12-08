@@ -13,19 +13,19 @@ public class Twitt {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer twitId;
+    private Integer twittId;
 
     @Column
     private Integer twittUid;
 
     @Column
-    private String twittDate;
+    private Long twittDate;
 
     @Column
     private String twittContent;
 
     @Builder
-    public Twitt(Integer twittUud, String twittDate, String twittContent) {
+    public Twitt(Integer twittUid, Long twittDate, String twittContent) {
         this.twittUid = twittUid;
         this.twittDate = twittDate;
         this.twittContent = twittContent;

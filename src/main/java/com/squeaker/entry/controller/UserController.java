@@ -19,26 +19,30 @@ public class UserController {
     @Autowired
     UserServiceImpl userService;
 
-    @PostMapping("/authemail")
-    public AuthCodeResponse authEmail(@RequestParam @NotNull String email) {
-        return userService.authEmail(email);
-    }
-
     @GetMapping("/{uuid}")
     public UserResponse getUser(@PathVariable Integer uuid) {
         return userService.getUser(uuid);
     }
 
+    @PostMapping("/authemail")
+    public AuthCodeResponse authEmail(@RequestParam @NotNull String email) {
+        return userService.authEmail(email);
+    }
+
+    @PostMapping("/validemail")
+    public void validEmail(@RequestParam String code) {
+        userService.validEmail(code);
+    }
+
     @PostMapping
     public void signUp(@RequestParam String userId, String userPw, String userName, String userIntro,
-                       String emailCode, @RequestParam(value = "file", required = false) MultipartFile file) {
+                       @RequestParam(value = "file", required = false) MultipartFile file) {
         userService.signUp(
                 UserSignUp.builder()
                 .userId(userId)
                 .userPw(userPw)
                 .userName(userName)
                 .userIntro(userIntro)
-                .emailcode(emailCode)
                 .multipartFile(file)
                 .build()
         );
