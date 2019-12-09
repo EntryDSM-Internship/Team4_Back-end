@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,8 +71,7 @@ public class UserServiceImpl implements UserService {
         List<FollowResponse> following = new ArrayList<>();
 
         for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
-            System.out.println(twitt.getTwittId());
-            twitts.add(TwittServiceImpl.getTwittList(user, twitt, imageRepository, twittLikeRespository));
+            twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository));
         }
         for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
             if(follows.getFollower().equals(user.getUuid())) {
@@ -120,6 +120,9 @@ public class UserServiceImpl implements UserService {
         if(userSignUp.getMultipartFile() != null) {
             File file = new File("D:\\Squeaker\\user\\"+userSignUp.getUserId()+".jpg");
             try {
+                FileWriter fileWriter = new FileWriter(file);
+                //fileWriter.flush();
+                fileWriter.close();
                 userSignUp.getMultipartFile().transferTo(file);
             } catch (IOException e) {
                 e.printStackTrace();

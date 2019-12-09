@@ -12,7 +12,7 @@ public class User {
 
     @Id
     @Column(unique = true)
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer uuid;
 
     @Column(nullable = false, unique = true, length = 30)

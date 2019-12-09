@@ -1,17 +1,16 @@
 package com.squeaker.entry.service;
 
-import com.squeaker.entry.domain.entitys.Follow;
-import com.squeaker.entry.domain.entitys.Image;
-import com.squeaker.entry.domain.entitys.Twitt;
-import com.squeaker.entry.domain.entitys.User;
+import com.squeaker.entry.domain.entitys.*;
 import com.squeaker.entry.domain.payload.response.TwittResponse;
 import com.squeaker.entry.domain.repository.*;
+import com.squeaker.entry.exception.TwittNotFoundException;
+import com.squeaker.entry.exception.UserNotFoundException;
+import com.squeaker.entry.exception.UserNotMatchException;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -35,6 +34,7 @@ public class TwittServiceImpl implements TwittService {
     @Override
     public List<TwittResponse> getTwitts(String token, Integer count) {
         User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        if(user == null) throw new UserNotFoundException();
         List<Integer> relationUser = new ArrayList<>();
 
         relationUser.add(user.getUuid());
@@ -42,11 +42,25 @@ public class TwittServiceImpl implements TwittService {
             relationUser.add(follow.getFollowing());
 
         List<TwittResponse> twitts = new ArrayList<>();
+        List<Twitt> twittList = twittRepository.findByTwittUidInOrderByTwittDateDesc(relationUser);
 
-        for(Twitt twitt : twittRepository.findByTwittUidInOrderByTwittDateDesc(relationUser)) {
-            twitts.add(getTwittList(user, twitt, imageRepository, twittLikeRespository));
+        for(int i = (count-1)*10; i < (count*10)-1; i++) {
+            try {
+                twitts.add(getTwittInfo(user, twittList.get(i), imageRepository, twittLikeRespository));
+            } catch (Exception e){
+                break;
+            }
         }
         return twitts;
+    }
+
+    @Override
+    public TwittResponse getTwitt(String token, Integer twittId) {
+        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        Twitt twitt = twittRepository.findByTwittId(twittId);
+        if(twitt == null) throw new TwittNotFoundException();
+
+        return getTwittInfo(user, twitt, imageRepository, twittLikeRespository);
     }
 
     @Override
@@ -62,16 +76,28 @@ public class TwittServiceImpl implements TwittService {
         );
     }
 
-    static TwittResponse getTwittList(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
-        List<String> imageList;
+    @Override
+    public void deleteTwit(String token, Integer twittId) {
+        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        Twitt twitt = twittRepository.findByTwittId(twittId);
+        if(user == null) throw new UserNotFoundException();
+        if(twitt == null) throw new TwittNotFoundException();
+        if(!user.getUuid().equals(twitt.getTwittUid())) throw new UserNotMatchException();
+
+        TwittLike twittLike = twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid());
+        List<Image> images = imageRepository.findByTwittId(twittId);
+
+        if(twittLike != null) twittLikeRespository.delete(twittLike);
+        for (Image i : images) imageRepository.delete(i);
+        twittRepository.delete(twitt);
+    }
+
+    static TwittResponse getTwittInfo(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
+        List<String> imageList = new ArrayList<>();
         List<Image> images = imageRepository.findByTwittId(twitt.getTwittId());
-        imageList = new ArrayList<>();
-        boolean like;
 
         for(Image image : images)
             imageList.add(image.getImageName());
-
-        like = twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid()) != null;
 
         return TwittResponse.builder()
                 .twittId(twitt.getTwittId())
@@ -79,7 +105,7 @@ public class TwittServiceImpl implements TwittService {
                 .twittContent(twitt.getTwittContent())
                 .twittDate(twitt.getTwittDate())
                 .twittImage(imageList)
-                .isLike(like)
+                .isLike(twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid()) != null)
                 .deleteAble(user.getUuid().equals(twitt.getTwittUid()))
                 .build();
     }

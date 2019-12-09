@@ -59,4 +59,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler({ TwittNotFoundException.class })
+    protected ResponseEntity<Object> twittNotFound(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Twitt Not Found",
+                new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
+    @ExceptionHandler({ UserNotMatchException.class })
+    protected ResponseEntity<Object> twittNotMatch(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Twitt Not Found",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
 }

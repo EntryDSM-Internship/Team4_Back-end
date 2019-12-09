@@ -8,4 +8,5 @@ import java.util.List;
 public interface TwittRepository extends JpaRepository<Twitt, Integer> {
     List<Twitt> findByTwittUidOrderByTwittDateDesc(Integer uuid);
     List<Twitt> findByTwittUidInOrderByTwittDateDesc(List<Integer> uuid);
+    Twitt findByTwittId(Integer twittId);
 }

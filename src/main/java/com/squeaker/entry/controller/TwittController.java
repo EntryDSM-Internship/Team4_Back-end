@@ -16,14 +16,24 @@ public class TwittController {
     TwittServiceImpl twittService;
 
     @GetMapping
-    public List<TwittResponse> getTwitt(@RequestHeader("Authorization") String token, @RequestParam Integer count) {
+    public List<TwittResponse> getTwitts(@RequestHeader("Authorization") String token, @RequestParam Integer count) {
         return twittService.getTwitts(token, count);
+    }
+
+    @GetMapping("/{twiitId}")
+    public TwittResponse getTwitt(@RequestHeader("Authorization") String token, @PathVariable Integer twiitId) {
+        return twittService.getTwitt(token, twiitId);
     }
 
     @PostMapping
     public void addTwitt(@RequestHeader("Authorization") String token, @RequestParam String content,
                          @RequestParam(value = "file", required = false) MultipartFile[] files) {
         twittService.addTwitt(token, content, files);
+    }
+
+    @DeleteMapping("/{TwittId}")
+    public void deleteTwitt(@RequestHeader("Authorization") String token, @PathVariable Integer TwittId) {
+        twittService.deleteTwit(token, TwittId);
     }
 
 }
