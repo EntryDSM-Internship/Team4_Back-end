@@ -18,6 +18,8 @@ import java.util.List;
 @Service
 public class TwittServiceImpl implements TwittService {
 
+    private static final String IMAGE_DIR = "D:/Squeaker/twitt/";
+
     private UserRepository userRepository;
     private TwittRepository twittRepository;
     private FollowRepository followRepository;
@@ -82,13 +84,13 @@ public class TwittServiceImpl implements TwittService {
         );
 
         for(int i = 0; i < files.length; i++) {
-            imageRepository.save(
+            Image image = imageRepository.save(
                     Image.builder()
                     .twittId(twitt.getTwittId())
                     .imageName("image_"+ twitt.getTwittId() +"-"+ i +".jpg")
                     .build()
             );
-            file = new File("D:\\Squeaker\\twitt\\image_"+ twitt.getTwittId() +"-"+ i +".jpg");
+            file = new File(IMAGE_DIR + image.getImageName());
             try {
                 fileWriter = new FileWriter(file);
                 fileWriter.close();
@@ -156,7 +158,7 @@ public class TwittServiceImpl implements TwittService {
         List<Comment> comments = commentRepository.findByCommentTwitIdOrderByCommentDateAsc(twitt.getTwittId());
 
         for(Image image : images)
-            imageList.add("D:/Squeaker/twitt/"+image.getImageName());
+            imageList.add(IMAGE_DIR + image.getImageName());
 
         return TwittResponse.builder()
                 .twittId(twitt.getTwittId())
