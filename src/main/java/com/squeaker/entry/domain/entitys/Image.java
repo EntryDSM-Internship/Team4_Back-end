@@ -21,4 +21,9 @@ public class Image {
     @Column
     private String imageName;
 
+    @Builder
+    public Image(Integer twittId, String imageName) {
+        this.twittId = twittId;
+        this.imageName = imageName;
+    }
 }

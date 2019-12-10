@@ -12,4 +12,6 @@ public interface TwittService {
     TwittResponse getTwitt(String token, Integer twittId);
     void addTwitt(String token, String content, MultipartFile[] files);
     void deleteTwit(String token, Integer twittId);
+    void twittLike(String token, Integer twittId);
+    void twittUnLike(String token, Integer twittId);
 }

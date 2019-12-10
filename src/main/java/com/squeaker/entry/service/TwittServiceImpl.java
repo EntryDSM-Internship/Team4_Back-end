@@ -3,13 +3,14 @@ package com.squeaker.entry.service;
 import com.squeaker.entry.domain.entitys.*;
 import com.squeaker.entry.domain.payload.response.TwittResponse;
 import com.squeaker.entry.domain.repository.*;
-import com.squeaker.entry.exception.TwittNotFoundException;
-import com.squeaker.entry.exception.UserNotFoundException;
-import com.squeaker.entry.exception.UserNotMatchException;
+import com.squeaker.entry.exception.*;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -67,15 +68,36 @@ public class TwittServiceImpl implements TwittService {
 
     @Override
     public void addTwitt(String token, String content, MultipartFile[] files) {
+        File file;
+        FileWriter fileWriter;
         User user = userRepository.findByUserId(JwtUtil.parseToken(token));
-        Integer uuid = user.getUuid();
-        twittRepository.save(
+        if(user == null) throw new UserNotFoundException();
+
+        Twitt twitt = twittRepository.save(
                 Twitt.builder()
-                .twittUid(uuid)
-                .twittContent(content)
-                .twittDate(new Date().getTime())
-                .build()
+                        .twittUid(user.getUuid())
+                        .twittContent(content)
+                        .twittDate(new Date().getTime())
+                        .build()
         );
+
+        for(int i = 0; i < files.length; i++) {
+            imageRepository.save(
+                    Image.builder()
+                    .twittId(twitt.getTwittId())
+                    .imageName("image_"+ twitt.getTwittId() +"-"+ i +".jpg")
+                    .build()
+            );
+            file = new File("D:\\Squeaker\\twitt\\image_"+ twitt.getTwittId() +"-"+ i +".jpg");
+            try {
+                fileWriter = new FileWriter(file);
+                fileWriter.close();
+                files[i].transferTo(file);
+            } catch (IOException e) {
+                e.printStackTrace();
+                throw new InvalidFileException();
+            }
+        }
     }
 
     @Override
@@ -94,13 +116,47 @@ public class TwittServiceImpl implements TwittService {
         twittRepository.delete(twitt);
     }
 
+    @Override
+    public void twittLike(String token, Integer twittId) {
+        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        Twitt twitt = twittRepository.findByTwittId(twittId);
+
+        if(user == null) throw new UserNotFoundException();
+        if(twitt == null) throw new TwittNotFoundException();
+
+        TwittLike twittLike = twittLikeRespository.findByTwittId(twitt.getTwittId());
+        if(twittLike != null) throw new AlreadyLikeException();
+
+        twittLikeRespository.save(
+                TwittLike.builder()
+                .twittId(twitt.getTwittId())
+                .uuid(user.getUuid())
+                .build()
+        );
+    }
+
+    @Override
+    public void twittUnLike(String token, Integer twittId) {
+        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        Twitt twitt = twittRepository.findByTwittId(twittId);
+
+        if(user == null) throw new UserNotFoundException();
+        if(twitt == null) throw new TwittNotFoundException();
+
+        TwittLike twittLike = twittLikeRespository.findByTwittId(twitt.getTwittId());
+        if(twittLike == null) throw new AlreadyUnLikeException();
+
+        twittLikeRespository.delete(twittLike);
+
+    }
+
     static TwittResponse getTwittInfo(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository, CommentRepository commentRepository) {
         List<String> imageList = new ArrayList<>();
         List<Image> images = imageRepository.findByTwittId(twitt.getTwittId());
         List<Comment> comments = commentRepository.findByCommentTwitIdOrderByCommentDateAsc(twitt.getTwittId());
 
         for(Image image : images)
-            imageList.add(image.getImageName());
+            imageList.add("D:/Squeaker/twitt/"+image.getImageName());
 
         return TwittResponse.builder()
                 .twittId(twitt.getTwittId())

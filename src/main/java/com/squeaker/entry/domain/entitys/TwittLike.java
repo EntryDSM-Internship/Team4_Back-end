@@ -1,5 +1,6 @@
 package com.squeaker.entry.domain.entitys;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,4 +17,9 @@ public class TwittLike {
 
     private Integer uuid;
 
+    @Builder
+    public TwittLike(Integer twittId, Integer uuid) {
+        this.twittId = twittId;
+        this.uuid = uuid;
+    }
 }

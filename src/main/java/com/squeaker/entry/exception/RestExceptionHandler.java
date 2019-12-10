@@ -77,4 +77,16 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler({ AlreadyLikeException.class })
+    protected ResponseEntity<Object> alreadyLike(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Already Like",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({ AlreadyUnLikeException.class })
+    protected ResponseEntity<Object> alreadyUnLike(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Already UnLike",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
 }

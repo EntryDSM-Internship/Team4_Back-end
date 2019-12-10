@@ -123,7 +123,6 @@ public class UserServiceImpl implements UserService {
             File file = new File("D:\\Squeaker\\user\\"+userSignUp.getUserId()+".jpg");
             try {
                 FileWriter fileWriter = new FileWriter(file);
-                //fileWriter.flush();
                 fileWriter.close();
                 userSignUp.getMultipartFile().transferTo(file);
             } catch (IOException e) {

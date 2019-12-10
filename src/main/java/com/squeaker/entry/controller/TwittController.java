@@ -27,7 +27,7 @@ public class TwittController {
 
     @PostMapping
     public void addTwitt(@RequestHeader("Authorization") String token, @RequestParam String content,
-                         @RequestParam(value = "file", required = false) MultipartFile[] files) {
+                         @RequestParam(value = "files", required = false) MultipartFile[] files) {
         twittService.addTwitt(token, content, files);
     }
 
