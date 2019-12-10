@@ -22,13 +22,15 @@ public class TwittServiceImpl implements TwittService {
     private FollowRepository followRepository;
     private ImageRepository imageRepository;
     private TwittLikeRespository twittLikeRespository;
+    private CommentRepository commentRepository;
 
-    public TwittServiceImpl(UserRepository userRepository, TwittRepository twittRepository, FollowRepository followRepository, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
+    public TwittServiceImpl(UserRepository userRepository, TwittRepository twittRepository, FollowRepository followRepository, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository, CommentRepository commentRepository) {
         this.userRepository = userRepository;
         this.twittRepository = twittRepository;
         this.followRepository = followRepository;
         this.imageRepository = imageRepository;
         this.twittLikeRespository = twittLikeRespository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -46,7 +48,7 @@ public class TwittServiceImpl implements TwittService {
 
         for(int i = (count-1)*10; i < (count*10)-1; i++) {
             try {
-                twitts.add(getTwittInfo(user, twittList.get(i), imageRepository, twittLikeRespository));
+                twitts.add(getTwittInfo(user, twittList.get(i), imageRepository, twittLikeRespository, commentRepository));
             } catch (Exception e){
                 break;
             }
@@ -60,7 +62,7 @@ public class TwittServiceImpl implements TwittService {
         Twitt twitt = twittRepository.findByTwittId(twittId);
         if(twitt == null) throw new TwittNotFoundException();
 
-        return getTwittInfo(user, twitt, imageRepository, twittLikeRespository);
+        return getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository);
     }
 
     @Override
@@ -92,9 +94,10 @@ public class TwittServiceImpl implements TwittService {
         twittRepository.delete(twitt);
     }
 
-    static TwittResponse getTwittInfo(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
+    static TwittResponse getTwittInfo(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository, CommentRepository commentRepository) {
         List<String> imageList = new ArrayList<>();
         List<Image> images = imageRepository.findByTwittId(twitt.getTwittId());
+        List<Comment> comments = commentRepository.findByCommentTwitIdOrderByCommentDateAsc(twitt.getTwittId());
 
         for(Image image : images)
             imageList.add(image.getImageName());
@@ -105,6 +108,7 @@ public class TwittServiceImpl implements TwittService {
                 .twittContent(twitt.getTwittContent())
                 .twittDate(twitt.getTwittDate())
                 .twittImage(imageList)
+                .comments(comments)
                 .isLike(twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid()) != null)
                 .deleteAble(user.getUuid().equals(twitt.getTwittUid()))
                 .build();

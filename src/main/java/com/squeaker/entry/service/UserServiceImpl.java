@@ -28,14 +28,16 @@ public class UserServiceImpl implements UserService {
     private TwittRepository twittRepository;
     private ImageRepository imageRepository;
     private TwittLikeRespository twittLikeRespository;
+    private CommentRepository commentRepository;
 
-    public UserServiceImpl(AuthMailRepository authMailRepository, UserRepository userRepository, FollowRepository followRepository, TwittRepository twittRepository, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository) {
+    public UserServiceImpl(AuthMailRepository authMailRepository, UserRepository userRepository, FollowRepository followRepository, TwittRepository twittRepository, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository, CommentRepository commentRepository) {
         this.authMailRepository = authMailRepository;
         this.userRepository = userRepository;
         this.followRepository = followRepository;
         this.twittRepository = twittRepository;
         this.imageRepository = imageRepository;
         this.twittLikeRespository = twittLikeRespository;
+        this.commentRepository = commentRepository;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class UserServiceImpl implements UserService {
         List<FollowResponse> following = new ArrayList<>();
 
         for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
-            twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository));
+            twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
         }
         for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
             if(follows.getFollower().equals(user.getUuid())) {

@@ -65,8 +65,14 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.NOT_FOUND, request);
     }
 
+    @ExceptionHandler({ CommentNotFoundException.class })
+    protected ResponseEntity<Object> commentNotFound(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Comment Not Found",
+                new HttpHeaders(), HttpStatus.NOT_FOUND, request);
+    }
+
     @ExceptionHandler({ UserNotMatchException.class })
-    protected ResponseEntity<Object> twittNotMatch(Exception ex, WebRequest request) {
+    protected ResponseEntity<Object> userNotMatch(Exception ex, WebRequest request) {
         return handleExceptionInternal(ex, "Twitt Not Found",
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }

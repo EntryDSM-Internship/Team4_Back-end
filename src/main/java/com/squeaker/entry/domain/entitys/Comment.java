@@ -22,10 +22,10 @@ public class Comment {
 
     private String comment;
 
-    private Integer commentDate;
+    private Long commentDate;
 
     @Builder
-    public Comment(Integer commentUid, Integer commentTwitId, String comment, Integer commentDate) {
+    public Comment(Integer commentUid, Integer commentTwitId, String comment, Long commentDate) {
         this.commentUid = commentUid;
         this.commentTwitId = commentTwitId;
         this.comment = comment;
