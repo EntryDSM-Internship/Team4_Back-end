@@ -22,6 +22,8 @@ import java.util.UUID;
 @Service
 public class UserServiceImpl implements UserService {
 
+    private static final String IMAGE_DIR = "D:/Squeaker/user/";
+
     private AuthMailRepository authMailRepository;
     private UserRepository userRepository;
     private FollowRepository followRepository;
@@ -83,7 +85,7 @@ public class UserServiceImpl implements UserService {
                         .uuid(follow.getUuid())
                         .userId(follow.getUserId())
                         .userName(follow.getUserName())
-                        .userImage(follow.getUserId()+".jpg")
+                        .userImage(IMAGE_DIR + follow.getUserId()+".jpg")
                         .build()
                 );
             } else {
