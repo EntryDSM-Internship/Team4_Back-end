@@ -89,4 +89,17 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
                 new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
     }
 
+    @ExceptionHandler({ AlreadyFollowException.class })
+    protected ResponseEntity<Object> alreadyFollow(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Already Follow",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+    @ExceptionHandler({ AlreadyUnFollowException.class })
+    protected ResponseEntity<Object> alreadyUnFollow(Exception ex, WebRequest request) {
+        return handleExceptionInternal(ex, "Already UnFollow",
+                new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+    }
+
+
 }

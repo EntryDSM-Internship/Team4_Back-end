@@ -3,6 +3,7 @@ package com.squeaker.entry.domain.entitys;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,4 +20,9 @@ public class Follow {
     @Column
     private Integer following;
 
+    @Builder
+    public Follow(Integer follower, Integer following) {
+        this.follower = follower;
+        this.following = following;
+    }
 }

@@ -118,40 +118,6 @@ public class TwittServiceImpl implements TwittService {
         twittRepository.delete(twitt);
     }
 
-    @Override
-    public void twittLike(String token, Integer twittId) {
-        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
-        Twitt twitt = twittRepository.findByTwittId(twittId);
-
-        if(user == null) throw new UserNotFoundException();
-        if(twitt == null) throw new TwittNotFoundException();
-
-        TwittLike twittLike = twittLikeRespository.findByTwittId(twitt.getTwittId());
-        if(twittLike != null) throw new AlreadyLikeException();
-
-        twittLikeRespository.save(
-                TwittLike.builder()
-                .twittId(twitt.getTwittId())
-                .uuid(user.getUuid())
-                .build()
-        );
-    }
-
-    @Override
-    public void twittUnLike(String token, Integer twittId) {
-        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
-        Twitt twitt = twittRepository.findByTwittId(twittId);
-
-        if(user == null) throw new UserNotFoundException();
-        if(twitt == null) throw new TwittNotFoundException();
-
-        TwittLike twittLike = twittLikeRespository.findByTwittId(twitt.getTwittId());
-        if(twittLike == null) throw new AlreadyUnLikeException();
-
-        twittLikeRespository.delete(twittLike);
-
-    }
-
     static TwittResponse getTwittInfo(User user, Twitt twitt, ImageRepository imageRepository, TwittLikeRespository twittLikeRespository, CommentRepository commentRepository) {
         List<String> imageList = new ArrayList<>();
         List<Image> images = imageRepository.findByTwittId(twitt.getTwittId());
