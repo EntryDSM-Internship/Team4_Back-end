@@ -37,7 +37,7 @@ public class JwtUtil {
             token = Jwts.parser().setSigningKey(SECURITY_KEY).parseClaimsJws(token).getBody().getSubject();
         } catch (ExpiredJwtException e) {
             throw new ExpiredTokenException();
-        } catch (MalformedJwtException e) {
+        } catch (JwtException e) {
             throw new InvalidTokenException();
         }
         return token;
