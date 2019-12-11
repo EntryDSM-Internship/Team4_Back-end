@@ -82,6 +82,7 @@ public class TwittServiceImpl implements TwittService {
                         .twittDate(new Date().getTime())
                         .build()
         );
+        if(files == null) return;
 
         for(int i = 0; i < files.length; i++) {
             Image image = imageRepository.save(
@@ -110,7 +111,7 @@ public class TwittServiceImpl implements TwittService {
         if(twitt == null) throw new TwittNotFoundException();
         if(!user.getUuid().equals(twitt.getTwittUid())) throw new UserNotMatchException();
 
-        TwittLike twittLike = twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid());
+        TwittLike twittLike = twittLikeRespository.findByTwittIdAndUuid(twitt.getTwittId(), user.getUuid());
         List<Image> images = imageRepository.findByTwittId(twittId);
 
         if(twittLike != null) twittLikeRespository.delete(twittLike);
@@ -133,7 +134,8 @@ public class TwittServiceImpl implements TwittService {
                 .twittDate(twitt.getTwittDate())
                 .twittImage(imageList)
                 .comments(comments)
-                .isLike(twittLikeRespository.findByTwittIdAndAndUuid(twitt.getTwittId(), user.getUuid()) != null)
+                .likeCount(twittLikeRespository.countAllByTwittId(twitt.getTwittId()))
+                .isLike(twittLikeRespository.findByTwittIdAndUuid(twitt.getTwittId(), user.getUuid()) != null)
                 .deleteAble(user.getUuid().equals(twitt.getTwittUid()))
                 .build();
     }

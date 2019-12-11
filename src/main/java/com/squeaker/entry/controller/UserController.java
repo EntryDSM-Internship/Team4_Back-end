@@ -4,6 +4,7 @@ import com.squeaker.entry.domain.entitys.User;
 import com.squeaker.entry.domain.payload.request.UserSignUp;
 import com.squeaker.entry.domain.payload.response.AuthCodeResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
+import com.squeaker.entry.domain.repository.UserRepository;
 import com.squeaker.entry.service.UserServiceImpl;
 import com.squeaker.entry.utils.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,11 @@ public class UserController {
 
     @Autowired
     UserServiceImpl userService;
+
+    @GetMapping
+    public UserResponse getUserInfo(@RequestHeader("Authorization") String token) {
+        return userService.getUserInfo(token);
+    }
 
     @GetMapping("/{uuid}")
     public UserResponse getUser(@PathVariable Integer uuid) {

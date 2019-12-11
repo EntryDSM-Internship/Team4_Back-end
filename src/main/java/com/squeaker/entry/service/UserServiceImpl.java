@@ -66,51 +66,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserResponse getUserInfo(String token) {
+        User user = userRepository.findByUserId(JwtUtil.parseToken(token));
+        if(user == null) throw new UserNotFoundException();
+
+
+        return userResponse(user);
+    }
+
+    @Override
     public UserResponse getUser(Integer uuid) {
         User user = userRepository.findByUuid(uuid);
         if(user == null) throw new UserNotFoundException();
 
-        List<TwittResponse> twitts = new ArrayList<>();
-        List<FollowResponse> follower = new ArrayList<>();
-        List<FollowResponse> following = new ArrayList<>();
-
-        for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
-            twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
-        }
-        for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
-            if(follows.getFollower().equals(user.getUuid())) {
-                User follow = userRepository.findByUuid(follows.getFollowing());
-                following.add(
-                        FollowResponse.builder()
-                        .uuid(follow.getUuid())
-                        .userId(follow.getUserId())
-                        .userName(follow.getUserName())
-                        .userImage(IMAGE_DIR + follow.getUserId()+".jpg")
-                        .build()
-                );
-            } else {
-                User follow = userRepository.findByUuid(follows.getFollower());
-                follower.add(
-                        FollowResponse.builder()
-                                .uuid(follow.getUuid())
-                                .userId(follow.getUserId())
-                                .userName(follow.getUserName())
-                                .userImage(follow.getUserId()+".jpg")
-                                .build()
-                );
-            }
-        }
-
-        return UserResponse.builder()
-                .uuid(user.getUuid())
-                .userId(user.getUserId())
-                .userName(user.getUserName())
-                .userIntro(user.getUserIntro())
-                .userImage(user.getUserId()+".jpg")
-                .timeLine(twitts)
-                .follower(follower)
-                .following(following)
-                .build();
+        return userResponse(user);
     }
 
     @Override
@@ -165,5 +134,49 @@ public class UserServiceImpl implements UserService {
         if(user == null) throw new UserNotFoundException();
 
         userRepository.delete(user);
+    }
+
+    private UserResponse userResponse(User user) {
+        List<TwittResponse> twitts = new ArrayList<>();
+        List<FollowResponse> follower = new ArrayList<>();
+        List<FollowResponse> following = new ArrayList<>();
+
+        for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
+            twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
+        }
+        for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
+            if(follows.getFollower().equals(user.getUuid())) {
+                User follow = userRepository.findByUuid(follows.getFollowing());
+                following.add(
+                        FollowResponse.builder()
+                                .uuid(follow.getUuid())
+                                .userId(follow.getUserId())
+                                .userName(follow.getUserName())
+                                .userImage(IMAGE_DIR + follow.getUserId()+".jpg")
+                                .build()
+                );
+            } else {
+                User follow = userRepository.findByUuid(follows.getFollower());
+                follower.add(
+                        FollowResponse.builder()
+                                .uuid(follow.getUuid())
+                                .userId(follow.getUserId())
+                                .userName(follow.getUserName())
+                                .userImage(follow.getUserId()+".jpg")
+                                .build()
+                );
+            }
+        }
+
+        return UserResponse.builder()
+                .uuid(user.getUuid())
+                .userId(user.getUserId())
+                .userName(user.getUserName())
+                .userIntro(user.getUserIntro())
+                .userImage(user.getUserId()+".jpg")
+                .timeLine(twitts)
+                .follower(follower)
+                .following(following)
+                .build();
     }
 }

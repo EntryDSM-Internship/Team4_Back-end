@@ -4,6 +4,7 @@ import com.squeaker.entry.domain.entitys.TwittLike;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TwittLikeRespository extends JpaRepository<TwittLike, Integer> {
-    TwittLike findByTwittIdAndAndUuid(Integer twittId, Integer uuid);
+    TwittLike findByTwittIdAndUuid(Integer twittId, Integer uuid);
     TwittLike findByTwittId(Integer twittId);
+    Integer countAllByTwittId(Integer twittId);
 }

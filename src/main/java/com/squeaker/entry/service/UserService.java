@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 public interface UserService {
     AuthCodeResponse authEmail(String email);
     void validEmail(String code);
+    UserResponse getUserInfo(String token);
     UserResponse getUser(Integer uuid);
     void signUp(UserSignUp userSignUp);
     void changeUser(User user, MultipartFile file);
