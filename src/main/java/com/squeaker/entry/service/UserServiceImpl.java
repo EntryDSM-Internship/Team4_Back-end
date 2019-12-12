@@ -1,6 +1,9 @@
 package com.squeaker.entry.service;
 
-import com.squeaker.entry.domain.entitys.*;
+import com.squeaker.entry.domain.entitys.EmailAuth;
+import com.squeaker.entry.domain.entitys.Follow;
+import com.squeaker.entry.domain.entitys.Twitt;
+import com.squeaker.entry.domain.entitys.User;
 import com.squeaker.entry.domain.payload.request.UserSignUp;
 import com.squeaker.entry.domain.payload.response.AuthCodeResponse;
 import com.squeaker.entry.domain.payload.response.TwittResponse;
@@ -112,6 +115,16 @@ public class UserServiceImpl implements UserService {
                 .userPrivate(0)
                 .build()
         );
+
+        new Thread(() -> {
+            try {
+                Thread.sleep(300000);
+                EmailAuth emailAuth = authMailRepository.findByAuthEmail(userSignUp.getUserId());
+                authMailRepository.delete(emailAuth);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
