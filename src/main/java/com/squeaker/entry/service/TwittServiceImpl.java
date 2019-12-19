@@ -122,7 +122,8 @@ public class TwittServiceImpl implements TwittService {
 
         if(twittLike != null) twittLikeRespository.delete(twittLike);
         for (Image i : images) {
-            new File(IMAGE_DIR + i.getImageName()).delete();
+            File file = new File(IMAGE_DIR + i.getImageName());
+            file.delete();
             imageRepository.delete(i);
         }
         twittRepository.delete(twitt);
@@ -134,7 +135,7 @@ public class TwittServiceImpl implements TwittService {
         List<Comment> comments = commentRepository.findByCommentTwitIdOrderByCommentDateAsc(twitt.getTwittId());
 
         for(Image image : images)
-            imageList.add(IMAGE_DIR + image.getImageName());
+            imageList.add(image.getImageName());
 
         return TwittResponse.builder()
                 .twittId(twitt.getTwittId())

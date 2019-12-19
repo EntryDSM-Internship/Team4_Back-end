@@ -143,11 +143,18 @@ public class UserServiceImpl implements UserService {
         if (info.getUserPrivate() != null) user.setUserPrivate(info.getUserPrivate());
 
         if(multipartFile != null) {
-            String fileName = multipartFile.getOriginalFilename();
-            File file = new File(IMAGE_DIR + user.getUserId() + "."
-                    + fileName.substring(fileName.lastIndexOf(".")+1));
-            file.deleteOnExit();
+            String fileName;
+            for(File f : new File(IMAGE_DIR).listFiles()) {
+                fileName = f.getName();
+                if(fileName.substring(0, fileName.lastIndexOf(".")).equals(user.getUserId())) {
+                    System.out.println(fileName);
+                    f.delete();
+                    break;
+                }
+            }
             try {
+                fileName = multipartFile.getOriginalFilename();
+                File file = new File(IMAGE_DIR + user.getUserId() + "." + fileName.substring(fileName.lastIndexOf(".")+1));
                 FileWriter fileWriter = new FileWriter(file);
                 fileWriter.close();
                 multipartFile.transferTo(file);
