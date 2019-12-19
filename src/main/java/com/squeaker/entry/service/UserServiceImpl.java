@@ -190,11 +190,20 @@ public class UserServiceImpl implements UserService {
         List<TwittResponse> twitts = new ArrayList<>();
         List<FollowResponse> follower = new ArrayList<>();
         List<FollowResponse> following = new ArrayList<>();
+        File[] fileList = new File(IMAGE_DIR + "user/").listFiles();
+        String fileExtension = ".jpg";
 
         for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
             twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
         }
         for(Follow follows : followRepository.findByFollowerOrFollowing(user.getUuid(), user.getUuid())) {
+            for (File f : fileList) {
+                String fileFullName = f.getName();
+                String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
+                if(fileName.equals(user.getUserId())) {
+                    fileExtension = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
+                }
+            }
             if(follows.getFollower().equals(user.getUuid())) {
                 User follow = userRepository.findByUuid(follows.getFollowing());
                 following.add(
@@ -202,7 +211,7 @@ public class UserServiceImpl implements UserService {
                                 .uuid(follow.getUuid())
                                 .userId(follow.getUserId())
                                 .userName(follow.getUserName())
-                                .userImage(follow.getUserId()+".jpg")
+                                .userImage(follow.getUserId()+"."+fileExtension)
                                 .build()
                 );
             } else {
@@ -212,9 +221,17 @@ public class UserServiceImpl implements UserService {
                                 .uuid(follow.getUuid())
                                 .userId(follow.getUserId())
                                 .userName(follow.getUserName())
-                                .userImage(follow.getUserId()+".jpg")
+                                .userImage(follow.getUserId()+"."+fileExtension)
                                 .build()
                 );
+            }
+        }
+
+        for (File f : fileList) {
+            String fileFullName = f.getName();
+            String fileName = fileFullName.substring(0, fileFullName.lastIndexOf("."));
+            if(fileName.equals(user.getUserId())) {
+                fileExtension = fileFullName.substring(fileFullName.lastIndexOf(".")+1);
             }
         }
 
@@ -223,7 +240,7 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .userIntro(user.getUserIntro())
-                .userImage(user.getUserId()+".jpg")
+                .userImage(user.getUserId()+"."+fileExtension)
                 .timeLine(twitts)
                 .follower(follower)
                 .following(following)
