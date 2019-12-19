@@ -12,6 +12,7 @@ import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.domain.repository.*;
 import com.squeaker.entry.exception.*;
 import com.squeaker.entry.utils.JwtUtil;
+import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -50,7 +51,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public AuthCodeResponse authEmail(String email) {
-        String uuid = UUID.randomUUID().toString();
+        String uuid = randomCode();
         authMailRepository.save(
                 EmailAuth.builder()
                         .authEmail(email)
@@ -245,5 +246,17 @@ public class UserServiceImpl implements UserService {
                 .follower(follower)
                 .following(following)
                 .build();
+    }
+
+    private String randomCode() {
+        StringBuilder code = new StringBuilder();
+        String[] codeList = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+        int random;
+        for (int i = 0; i < 6; i++) {
+            random = (int) (Math.random() * codeList.length);
+            code.append(codeList[random]);
+        }
+
+        return code.toString();
     }
 }
