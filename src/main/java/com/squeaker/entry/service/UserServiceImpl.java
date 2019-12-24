@@ -11,8 +11,8 @@ import com.squeaker.entry.domain.payload.response.user.FollowResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.domain.repository.*;
 import com.squeaker.entry.exception.*;
+import com.squeaker.entry.utils.EmailService;
 import com.squeaker.entry.utils.JwtUtil;
-import org.omg.CORBA.PRIVATE_MEMBER;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -61,6 +61,7 @@ public class UserServiceImpl implements UserService {
         );
 
         new Thread(() -> {
+            EmailService.sendMail(email, uuid);
             try {
                 Thread.sleep(300000);
             } catch (InterruptedException e) {

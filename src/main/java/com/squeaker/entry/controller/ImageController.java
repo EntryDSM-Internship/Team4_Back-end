@@ -13,7 +13,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 
 @RestController
-@RequestMapping("/api/v1/image")
+@RequestMapping("/image")
 public class ImageController {
 
     @Value("${squeaker.image-dir}")
