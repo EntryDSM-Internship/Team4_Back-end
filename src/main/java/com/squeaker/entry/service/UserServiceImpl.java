@@ -5,7 +5,6 @@ import com.squeaker.entry.domain.entitys.Follow;
 import com.squeaker.entry.domain.entitys.Twitt;
 import com.squeaker.entry.domain.entitys.User;
 import com.squeaker.entry.domain.payload.request.UserSignUp;
-import com.squeaker.entry.domain.payload.response.AuthCodeResponse;
 import com.squeaker.entry.domain.payload.response.TwittResponse;
 import com.squeaker.entry.domain.payload.response.user.FollowResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
@@ -49,7 +48,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthCodeResponse authEmail(String email) {
+    public void authEmail(String email) {
         String uuid = randomCode();
         authMailRepository.save(
                 EmailAuth.builder()
@@ -59,8 +58,8 @@ public class UserServiceImpl implements UserService {
                         .build()
         );
 
+        EmailService.sendMail(email, uuid);
         new Thread(() -> {
-            EmailService.sendMail(email, uuid);
             try {
                 Thread.sleep(300000);
             } catch (InterruptedException e) {
@@ -69,13 +68,11 @@ public class UserServiceImpl implements UserService {
             EmailAuth emailAuth = authMailRepository.findByAuthEmail(email);
             authMailRepository.delete(emailAuth);
         });
-
-        return new AuthCodeResponse(uuid);
     }
 
     @Override
-    public void validEmail(String code) {
-        EmailAuth auth = authMailRepository.findByAuthCode(code);
+    public void validEmail(String email, String code) {
+        EmailAuth auth = authMailRepository.findByAuthEmailAndAuthCode(email, code);
         if(auth == null) throw new InvalidAuthCodeException();
 
         auth.setAuthState("Authorized");
@@ -192,7 +189,7 @@ public class UserServiceImpl implements UserService {
         List<FollowResponse> follower = new ArrayList<>();
         List<FollowResponse> following = new ArrayList<>();
         File[] fileList = new File(IMAGE_DIR + "user/").listFiles();
-        String fileExtension = ".jpg";
+        String fileExtension = null;
 
         for(Twitt twitt : twittRepository.findByTwittUidOrderByTwittDateDesc(user.getUuid())) {
             twitts.add(TwittServiceImpl.getTwittInfo(user, twitt, imageRepository, twittLikeRespository, commentRepository));
@@ -241,7 +238,7 @@ public class UserServiceImpl implements UserService {
                 .userId(user.getUserId())
                 .userName(user.getUserName())
                 .userIntro(user.getUserIntro())
-                .userImage(user.getUserId()+"."+fileExtension)
+                .userImage(fileExtension==null?"none":user.getUserId()+"."+fileExtension)
                 .timeLine(twitts)
                 .follower(follower)
                 .following(following)

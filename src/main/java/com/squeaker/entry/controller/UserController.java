@@ -2,7 +2,6 @@ package com.squeaker.entry.controller;
 
 import com.squeaker.entry.domain.entitys.User;
 import com.squeaker.entry.domain.payload.request.UserSignUp;
-import com.squeaker.entry.domain.payload.response.AuthCodeResponse;
 import com.squeaker.entry.domain.payload.response.user.UserResponse;
 import com.squeaker.entry.service.UserServiceImpl;
 import com.squeaker.entry.utils.JwtUtil;
@@ -30,13 +29,13 @@ public class UserController {
     }
 
     @PostMapping("/authemail")
-    public AuthCodeResponse authEmail(@RequestParam @NotNull String email) {
-        return userService.authEmail(email);
+    public void authEmail(@RequestParam @NotNull String email) {
+        userService.authEmail(email);
     }
 
     @PostMapping("/validemail")
-    public void validEmail(@RequestParam String code) {
-        userService.validEmail(code);
+    public void validEmail(@RequestParam String email, String code) {
+        userService.validEmail(email, code);
     }
 
     @PostMapping
